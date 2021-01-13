@@ -1,0 +1,6 @@
+server:
+  port: 8081
+config:
+  user:
+    name: weixiao
+    age: 10
