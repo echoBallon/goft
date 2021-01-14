@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,5 +13,6 @@ func NewUserMiddleware() *UserMiddleware {
 }
 
 func (this *UserMiddleware) OnRequest(context *gin.Context) error {
+	fmt.Println("user-mid")
 	return nil
 }

@@ -26,14 +26,15 @@ func (this *Goft) Launch() {
 /**
 add middleware
 */
-func (this *Goft) Attach(f Fairing) *Goft {
+func (this *Goft) Attach(fs...Fairing) *Goft {
 	this.Use(func(context *gin.Context) {
-		err := f.OnRequest(context)
-		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			context.Next()
+		for _,f :=range fs {
+			err := f.OnRequest(context)
+			if err != nil {
+				context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			}
 		}
+		context.Next()
 	})
 	return this
 }
@@ -86,6 +87,5 @@ func (this *Goft) setProp(class IClass) {
 			f.Set(reflect.New(f.Type().Elem()))
 			f.Elem().Set(reflect.ValueOf(p).Elem())
 		}
-
 	}
 }

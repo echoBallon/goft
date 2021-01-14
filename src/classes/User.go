@@ -31,11 +31,6 @@ func (this *UserClass) UserDetail(ctx *gin.Context) goft.Model {
 	err := ctx.BindUri(user)
 	goft.Error(err)
 	this.Table("users").Where("user_id=?", user.UserId).Find(&user)
-	//has, err := this.Table("users").Where("user_id=?", user.UserId).Get(user)
-	//if !has {
-	//	goft.Error(fmt.Errorf("数据不存在"))
-	//}
-	//goft.Error(err)
 	return user
 }
 
