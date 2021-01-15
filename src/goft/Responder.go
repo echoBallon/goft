@@ -19,6 +19,8 @@ type Responder interface {
 func Convert(handler interface{}) gin.HandlerFunc {
 	h_ref := reflect.ValueOf(handler)
 	for _, r := range ResponderList {
+		//获取Responder 的值
+		//只有类型 没有值
 		r_ref := reflect.ValueOf(r).Elem()
 		if h_ref.Type().ConvertibleTo(r_ref.Type()) {
 			r_ref.Set(h_ref)

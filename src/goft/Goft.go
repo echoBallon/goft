@@ -3,7 +3,6 @@ package goft
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"reflect"
 )
 
@@ -20,19 +19,17 @@ func Ignite() *Goft {
 }
 func (this *Goft) Launch() {
 	config := InitConfig()
-	this.Run(fmt.Sprintf(":%d" ,config.Server.Port))
+	this.Run(fmt.Sprintf(":%d", config.Server.Port))
 }
 
 /**
 add middleware
 */
-func (this *Goft) Attach(fs...Fairing) *Goft {
+func (this *Goft) Attach(fs ...Fairing) *Goft {
 	this.Use(func(context *gin.Context) {
-		for _,f :=range fs {
+		for _, f := range fs {
 			err := f.OnRequest(context)
-			if err != nil {
-				context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			}
+			Error(err)
 		}
 		context.Next()
 	})
@@ -59,8 +56,10 @@ func (this *Goft) Handle(httpMethod, relativePath string, handler interface{}) *
 
 // 加一个group 参数
 func (this *Goft) Mount(group string, classes ...IClass) *Goft {
+	//设置当前的路由需要设置的group
 	this.g = this.Group(group)
 	for _, class := range classes {
+		//执行传入函数的build 注册路由
 		class.Build(this)
 		this.setProp(class)
 	}

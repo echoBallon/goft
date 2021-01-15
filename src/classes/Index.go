@@ -25,5 +25,5 @@ func (this *IndexClass) GetIndex() gin.HandlerFunc {
 router register
  */
 func (this *IndexClass) Build(goft *goft.Goft) {
-	goft.Handle("GET","/", this.GetIndex()) //index
+	//goft.Handle("GET","/", this.GetIndex()) //index
 }
