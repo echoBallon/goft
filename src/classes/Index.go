@@ -7,6 +7,7 @@ import (
 )
 
 type IndexClass struct {
+
 }
 
 func NewIndexClass() *IndexClass {

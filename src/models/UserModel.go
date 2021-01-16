@@ -3,7 +3,7 @@ package models
 import "fmt"
 
 type UserModel struct {
-	UserId   int `uri:"id" binding:"required,gt=0"`
+	UserId   int `json:"id" uri:"id" binding:"required,gt=0"`
 	UserName string
 }
 
