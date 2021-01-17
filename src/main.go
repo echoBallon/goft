@@ -11,6 +11,6 @@ func main() {
 	goft.Ignite().
 		Beans(goft.NewGormAdapter(),goft.NewXOrmAdapter()).//初始化db
 		Attach(middlewares.NewUserMiddleware(),middlewares.NewAuthMiddleware()).//初始化中间件
-		Mount("v1", classes.NewIndexClass(), classes.NewUserClass()).//加载应用
+		Mount("v1", classes.NewIndexClass(), classes.NewUserClass(),classes.NewArticleClass()).//加载应用
 		Launch()//开始执行
 }

@@ -3,23 +3,30 @@ package goft
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"reflect"
 )
 
 type Goft struct {
 	*gin.Engine
-	g     *gin.RouterGroup
-	props []interface{}
+	g           *gin.RouterGroup
+	beanFactory *BeanFactory
 }
 
 func Ignite() *Goft {
-	g := &Goft{Engine: gin.Default(), props: make([]interface{}, 0)}
+	g := &Goft{Engine: gin.Default(), beanFactory: NewBeanFactory()}
 	g.Use(ErrorHandler()) //must use error middleware
+	config := InitConfig()
+	g.beanFactory.setBean(config) //整个配置加载进bean中
+	if config.Server.Html != "" {
+		g.LoadHTMLGlob("src/"+config.Server.Html)
+	}
 	return g
 }
 func (this *Goft) Launch() {
-	config := InitConfig()
-	this.Run(fmt.Sprintf(":%d", config.Server.Port))
+	var port int32 = 8080
+	if config := this.beanFactory.GetBean(new(SysConfig)); config != nil {
+		port = config.(*SysConfig).Server.Port
+	}
+	this.Run(fmt.Sprintf(":%d", port))
 }
 
 /**
@@ -40,7 +47,7 @@ func (this *Goft) Attach(fs ...Fairing) *Goft {
 init db
 */
 func (this *Goft) Beans(beans ...interface{}) *Goft {
-	this.props = append(this.props, beans...)
+	this.beanFactory.setBean(beans...)
 	return this
 }
 
@@ -48,6 +55,7 @@ func (this *Goft) Beans(beans ...interface{}) *Goft {
 overwrite
 */
 func (this *Goft) Handle(httpMethod, relativePath string, handler interface{}) *Goft {
+
 	if h := Convert(handler); h != nil {
 		this.g.Handle(httpMethod, relativePath, h)
 	}
@@ -61,37 +69,7 @@ func (this *Goft) Mount(group string, classes ...IClass) *Goft {
 	for _, class := range classes {
 		//执行传入函数的build 注册路由
 		class.Build(this)
-		//注入初始化db
-		this.setProp(class)
+		this.beanFactory.inject(class)
 	}
 	return this
-}
-
-//获取属性
-func (this *Goft) getProp(t reflect.Type) interface{} {
-	//寻找当前db注入的是否能包含我们需要使用的Orm
-	for _, p := range this.props {
-		if t == reflect.TypeOf(p) {
-			return p
-		}
-	}
-	return nil
-}
-func (this *Goft) setProp(class IClass) {
-	//获struct值
-	vClass := reflect.ValueOf(class).Elem()
-	//循环获取struct参数
-	for i := 0; i < vClass.NumField(); i++ {
-		f := vClass.Field(i)
-		//如果参数不存在 或者不是指针 就退出
-		if !f.IsNil() || f.Kind() != reflect.Ptr {
-			continue
-		}
-		if p := this.getProp(f.Type()); p != nil {
-			//初始化
-			f.Set(reflect.New(f.Type().Elem()))
-			//赋值
-			f.Elem().Set(reflect.ValueOf(p).Elem())
-		}
-	}
 }

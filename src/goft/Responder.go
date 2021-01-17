@@ -9,7 +9,7 @@ import (
 var ResponderList []Responder
 
 func init() {
-	ResponderList = []Responder{new(StringResponder), new(ModelResponder), new(ModelsResponder)}
+	ResponderList = []Responder{new(StringResponder), new(ModelResponder), new(ModelsResponder),new(ViewResponder)}
 }
 
 type Responder interface {
@@ -52,5 +52,14 @@ func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		context.Writer.Header().Set("Content-type", "application/json")
 		context.Writer.WriteString(string(this(context)))
+	}
+}
+
+
+type View string
+type ViewResponder func(*gin.Context) View
+func(this ViewResponder)RespondTo() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.HTML(200,string(this(context))+".html",nil )
 	}
 }

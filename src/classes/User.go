@@ -8,7 +8,8 @@ import (
 
 type UserClass struct {
 	*goft.GormAdapter
-	 //*goft.XOrmAdapter
+	//*goft.XOrmAdapter
+	Age *goft.Value `prefix:"user.age"`
 }
 
 func NewUserClass() *UserClass {
@@ -16,7 +17,7 @@ func NewUserClass() *UserClass {
 }
 
 func (this *UserClass) UserName(ctx *gin.Context) string {
-	return "echo"
+	return "echo"+this.Age.String()
 }
 func (this *UserClass) UserList(ctx *gin.Context) goft.Models {
 	users := []*models.UserModel{
@@ -38,7 +39,7 @@ func (this *UserClass) UserDetail(ctx *gin.Context) goft.Model {
 router register
 */
 func (this *UserClass) Build(goft *goft.Goft) {
-	//goft.Handle("GET", "/user_name", this.UserName)         //index
-	//goft.Handle("GET", "/user_list", this.UserList)         //index
+	goft.Handle("GET", "/user_name", this.UserName)         //index
+	goft.Handle("GET", "/user_list", this.UserList)         //index
 	goft.Handle("GET", "/user_detail/:id", this.UserDetail) //index
 }
