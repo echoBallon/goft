@@ -49,7 +49,6 @@ func(this *Value) String() string {
 	prefix:=strings.Split(get_prefix,".")
 	if config:=this.Beanfactory.GetBean(new(SysConfig));config!=nil{
 		get_value:=GetConfigValue(config.(*SysConfig).Config,prefix,0)
-		fmt.Println(get_value)
 		if get_value!=nil{
 			return fmt.Sprintf("%v",get_value)
 		}else{

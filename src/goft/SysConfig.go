@@ -45,3 +45,6 @@ func InitConfig() *SysConfig {
 	}
 	return config
 }
+func(this *SysConfig) Name() string{
+	return "SysConfig"
+}

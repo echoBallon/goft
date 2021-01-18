@@ -9,15 +9,16 @@ type Goft struct {
 	*gin.Engine
 	g           *gin.RouterGroup
 	beanFactory *BeanFactory
+	exprData    map[string]interface{}
 }
 
 func Ignite() *Goft {
-	g := &Goft{Engine: gin.Default(), beanFactory: NewBeanFactory()}
+	g := &Goft{Engine: gin.Default(), beanFactory: NewBeanFactory(), exprData: map[string]interface{}{}}
 	g.Use(ErrorHandler()) //must use error middleware
 	config := InitConfig()
 	g.beanFactory.setBean(config) //整个配置加载进bean中
 	if config.Server.Html != "" {
-		g.LoadHTMLGlob("src/"+config.Server.Html)
+		g.LoadHTMLGlob("src/" + config.Server.Html)
 	}
 	return g
 }
@@ -26,6 +27,7 @@ func (this *Goft) Launch() {
 	if config := this.beanFactory.GetBean(new(SysConfig)); config != nil {
 		port = config.(*SysConfig).Server.Port
 	}
+	getCronTask().Start()
 	this.Run(fmt.Sprintf(":%d", port))
 }
 
@@ -46,7 +48,11 @@ func (this *Goft) Attach(fs ...Fairing) *Goft {
 /**
 init db
 */
-func (this *Goft) Beans(beans ...interface{}) *Goft {
+func (this *Goft) Beans(beans ...Bean) *Goft {
+	// 取出bean的名称 ，然后 加入到exprData里面
+	for _,bean:=range beans{
+		this.exprData[bean.Name()]=bean
+	}
 	this.beanFactory.setBean(beans...)
 	return this
 }
@@ -70,6 +76,29 @@ func (this *Goft) Mount(group string, classes ...IClass) *Goft {
 		//执行传入函数的build 注册路由
 		class.Build(this)
 		this.beanFactory.inject(class)
+		this.Beans(class) //控制器 也作为bean加入到bean容器
 	}
+	return this
+}
+
+/**
+cron task
+*/
+func (this *Goft) Task(cron string, expr interface{}) *Goft {
+	var err error
+	//func
+	if f, ok := expr.(func()); ok {
+		_, err = getCronTask().AddFunc(cron, f)
+	}
+	// string
+	if exp, ok := expr.(Expr); ok {
+		_, err = getCronTask().AddFunc(cron, func() {
+			a, expErr := ExecExpr(exp, this.exprData)
+			fmt.Println(a,exp,this.exprData)
+			Error(expErr)
+		})
+
+	}
+	Error(err)
 	return this
 }

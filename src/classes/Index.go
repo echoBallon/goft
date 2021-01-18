@@ -23,3 +23,6 @@ router register
 func (this *IndexClass) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/", this.GetIndex) //index
 }
+func(this *IndexClass) Name() string{
+	return "IndexClass"
+}

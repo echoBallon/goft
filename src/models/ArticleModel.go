@@ -2,7 +2,8 @@ package models
 
 type ArticleModel struct {
 	NewsId int `json:"id" gorm:"column:id" uri:"id" binding:"required"`
-	NewTitle  string `json:"title" gorm:"column:title"`
+	NewsTitle  string `json:"title" gorm:"column:title"`
+	NewsView int `json:"view" gorm:"column:view"`
 }
 
 func NewArticleModel() *ArticleModel {

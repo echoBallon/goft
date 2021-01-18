@@ -43,3 +43,7 @@ func (this *UserClass) Build(goft *goft.Goft) {
 	goft.Handle("GET", "/user_list", this.UserList)         //index
 	goft.Handle("GET", "/user_detail/:id", this.UserDetail) //index
 }
+
+func(this *UserClass) Name() string{
+	return "UserClass"
+}

@@ -27,6 +27,7 @@ func Error(err error, msg ...string) {
 		if len(msg) > 0 {
 			errMsg = msg[0]
 		}
+		log.Println(errMsg)
 		panic(errMsg)
 	}
 }
