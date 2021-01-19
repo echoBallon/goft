@@ -50,8 +50,8 @@ init db
 */
 func (this *Goft) Beans(beans ...Bean) *Goft {
 	// 取出bean的名称 ，然后 加入到exprData里面
-	for _,bean:=range beans{
-		this.exprData[bean.Name()]=bean
+	for _, bean := range beans {
+		this.exprData[bean.Name()] = bean
 	}
 	this.beanFactory.setBean(beans...)
 	return this
@@ -96,7 +96,6 @@ func (this *Goft) Task(cron string, expr interface{}) *Goft {
 			_, expErr := ExecExpr(exp, this.exprData)
 			Error(expErr)
 		})
-
 	}
 	Error(err)
 	return this
