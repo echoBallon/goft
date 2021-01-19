@@ -32,8 +32,9 @@ func (this *ArticleClass) UpdateViews(params ...interface{}) {
 func (this *ArticleClass) UpdateViewsDone() {
 	log.Println("update view done")
 }
-func (this *ArticleClass) Test() {
+func (this *ArticleClass) Test() interface{}{
 	log.Println("test")
+	return nil
 }
 
 /**

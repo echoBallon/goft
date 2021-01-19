@@ -93,8 +93,7 @@ func (this *Goft) Task(cron string, expr interface{}) *Goft {
 	// string
 	if exp, ok := expr.(Expr); ok {
 		_, err = getCronTask().AddFunc(cron, func() {
-			a, expErr := ExecExpr(exp, this.exprData)
-			fmt.Println(a,exp,this.exprData)
+			_, expErr := ExecExpr(exp, this.exprData)
 			Error(expErr)
 		})
 
